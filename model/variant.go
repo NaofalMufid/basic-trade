@@ -8,7 +8,7 @@ import (
 
 type Variants struct {
 	ID           int        `gorm:"type:int"`
-	UUID         uuid.UUID  `gorm:"type:varchar(255)"`
+	UUID         uuid.UUID  `gorm:"type:varchar(100);uniqueIndex" json:"uuid"`
 	Variant_Name string     `gorm:"type:varchar(150)"`
 	Quantity     string     `gorm:"type:int"`
 	Product_ID   string     `gorm:"type:varchar(255);ForeignKey:Product_ID"`

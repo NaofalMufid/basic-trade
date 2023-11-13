@@ -2,9 +2,15 @@ package main
 
 import (
 	"basic-trade/config"
+	"basic-trade/controller"
 	"basic-trade/model"
-	"fmt"
+	"basic-trade/repository"
+	"basic-trade/router"
+	"basic-trade/service"
+	"net/http"
+	"os"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -15,9 +21,32 @@ func main() {
 	}
 
 	db := config.DBInit()
+	validate := validator.New()
 
 	db.Table("admins").AutoMigrate(&model.Admins{})
 	db.Table("products").AutoMigrate(&model.Products{})
 	db.Table("variants").AutoMigrate(&model.Variants{})
-	fmt.Println("Migrasi dulu")
+
+	// Init Repository
+	adminRepository := repository.NewAdminRepository(db)
+
+	// Init Service
+	adminService := service.NewAdminServiceImpl(adminRepository, validate)
+
+	// Init Controller
+	adminController := controller.NewAdminController(adminService)
+
+	// Router
+	routes := router.NewRouter(adminController)
+
+	port := os.Getenv("API_PORT")
+	server := &http.Server{
+		Addr:    port,
+		Handler: routes,
+	}
+
+	err = server.ListenAndServe()
+	if err != nil {
+		panic(err)
+	}
 }

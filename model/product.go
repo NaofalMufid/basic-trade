@@ -8,7 +8,7 @@ import (
 
 type Products struct {
 	ID        int        `gorm:"type:int"`
-	UUID      uuid.UUID  `gorm:"type:varchar(255)"`
+	UUID      uuid.UUID  `gorm:"type:varchar(100);uniqueIndex" json:"uuid"`
 	Name      string     `gorm:"type:varchar(100)"`
 	Image_URL string     `gorm:"type:varchar(255)"`
 	Admin_ID  string     `gorm:"type:varchar(255);ForeignKey:Admin_ID"`
