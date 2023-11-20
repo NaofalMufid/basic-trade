@@ -29,15 +29,18 @@ func main() {
 
 	// Init Repository
 	adminRepository := repository.NewAdminRepository(db)
+	productRepository := repository.NewProductRepository(db)
 
 	// Init Service
 	adminService := service.NewAdminServiceImpl(adminRepository, validate)
+	productService := service.NewProductService(productRepository, validate)
 
 	// Init Controller
 	adminController := controller.NewAdminController(adminService)
+	productController := controller.NewProductController(productService, validate)
 
 	// Router
-	routes := router.NewRouter(adminController)
+	routes := router.NewRouter(adminController, productController)
 
 	port := os.Getenv("API_PORT")
 	server := &http.Server{
