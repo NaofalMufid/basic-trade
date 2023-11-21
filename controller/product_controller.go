@@ -64,12 +64,53 @@ func (c ProductController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, webResponse)
 }
 
+func (c ProductController) Edit(ctx *gin.Context) {
+	productUUID := ctx.Param("productUUID")
+	var updateProduct model.Products
+	if err := ctx.ShouldBindJSON(&updateProduct); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := c.productService.Update(productUUID, &updateProduct)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	webResponse := response.Response{
+		Code:    200,
+		Status:  true,
+		Message: "successfully update product",
+		Data:    nil,
+	}
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, webResponse)
+}
+
 func (c ProductController) GetAll(ctx *gin.Context) {
 	productResponse := c.productService.GetAll()
 	webResponse := response.Response{
 		Code:    200,
 		Status:  true,
-		Message: "successfully get product response",
+		Message: "successfully get all product",
+		Data:    productResponse,
+	}
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, webResponse)
+}
+
+func (c ProductController) GetByAdminID(ctx *gin.Context) {
+	adminData := ctx.MustGet("adminData").(jwt5.MapClaims)
+	adminID := uint(adminData["id"].(float64))
+
+	productResponse, err := c.productService.GetByAdminID(int(adminID))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	webResponse := response.Response{
+		Code:    200,
+		Status:  true,
+		Message: "successfully get all product",
 		Data:    productResponse,
 	}
 	ctx.Header("Content-Type", "application/json")
@@ -77,14 +118,27 @@ func (c ProductController) GetAll(ctx *gin.Context) {
 }
 
 func (c ProductController) GetById(ctx *gin.Context) {
-	productId := ctx.Param("productUUID")
+	productUUID := ctx.Param("productUUID")
 
-	productResponse := c.productService.GetById(productId)
+	productResponse := c.productService.GetById(productUUID)
 	webResponse := response.Response{
 		Code:    200,
 		Status:  true,
-		Message: "successfully get product response",
+		Message: "successfully get product",
 		Data:    productResponse,
+	}
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, webResponse)
+}
+
+func (c ProductController) Delete(ctx *gin.Context) {
+	productUUID := ctx.Param("productUUID")
+	c.productService.Delete(productUUID)
+	webResponse := response.Response{
+		Code:    200,
+		Status:  true,
+		Message: "successfully delete product",
+		Data:    nil,
 	}
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(http.StatusOK, webResponse)

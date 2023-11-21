@@ -29,9 +29,11 @@ func NewRouter(AdminController *controller.AdminController, ProductController *c
 	productRouter := router.Group("/products")
 	{
 		productRouter.Use(middleware.Authentication())
-		productRouter.GET("/", ProductController.GetAll)
-		productRouter.GET("/:productUUID", ProductController.GetById)
+		productRouter.GET("/", ProductController.GetByAdminID)
 		productRouter.POST("/", ProductController.Create)
+		productRouter.GET("/:productUUID", middleware.ProductAuthorization(), ProductController.GetById)
+		productRouter.PUT("/:productUUID", middleware.ProductAuthorization(), ProductController.Edit)
+		productRouter.DELETE("/:productUUID", middleware.ProductAuthorization(), ProductController.Delete)
 	}
 
 	return service
