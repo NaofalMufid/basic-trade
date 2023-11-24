@@ -1,6 +1,7 @@
 package service
 
 import (
+	"basic-trade/helper"
 	"basic-trade/model"
 	"basic-trade/repository"
 
@@ -13,7 +14,7 @@ type ProductService interface {
 	GetByAdminID(adminID int) ([]model.Products, error)
 	GetById(uuid string) model.Products
 	Create(product model.Products) error
-	Update(uuid string, product *model.Products) error
+	Update(uuid string, product model.Products) error
 	Delete(uuid string) error
 }
 
@@ -41,11 +42,16 @@ func (p ProductServiceImpl) Create(product model.Products) error {
 	return nil
 }
 
-func (p ProductServiceImpl) Update(uuid string, product *model.Products) error {
+func (p ProductServiceImpl) Update(uuid string, product model.Products) error {
 	productData, err := p.ProductRepository.FindById(uuid)
 	if err != nil {
 		return err
 	}
+
+	if err := helper.DeleteFile(productData.Image_URL); err != nil {
+		return err
+	}
+
 	productData.Name = product.Name
 	productData.Image_URL = product.Image_URL
 	err = p.ProductRepository.Update(productData)
@@ -99,7 +105,16 @@ func (p ProductServiceImpl) GetById(uuid string) model.Products {
 }
 
 func (p ProductServiceImpl) Delete(uuid string) error {
-	err := p.ProductRepository.Delete(uuid)
+	productData, err := p.ProductRepository.FindById(uuid)
+	if err != nil {
+		return err
+	}
+
+	if err := helper.DeleteFile(productData.Image_URL); err != nil {
+		return err
+	}
+
+	err = p.ProductRepository.Delete(uuid)
 	if err != nil {
 		return err
 	}

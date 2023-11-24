@@ -3,6 +3,7 @@ package controller
 import (
 	"basic-trade/data/request"
 	"basic-trade/data/response"
+	"basic-trade/helper"
 	"basic-trade/model"
 	"basic-trade/service"
 	"net/http"
@@ -31,8 +32,7 @@ func (c ProductController) Create(ctx *gin.Context) {
 
 	productRequest := request.CreateProductRequest{}
 
-	err := ctx.ShouldBindJSON(&productRequest)
-	if err != nil {
+	if err := ctx.ShouldBind(&productRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -42,11 +42,18 @@ func (c ProductController) Create(ctx *gin.Context) {
 		return
 	}
 
+	fileName := helper.RemoveExtension(productRequest.Image.Filename)
+	uploadResult, err := helper.UploadFile(productRequest.Image, fileName)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	newUUID := uuid.New()
 	product := model.Products{
 		UUID:      newUUID,
 		Name:      productRequest.Name,
-		Image_URL: productRequest.Image_URL,
+		Image_URL: uploadResult,
 		Admin_ID:  adminID,
 	}
 	if err := c.productService.Create(product); err != nil {
@@ -66,16 +73,34 @@ func (c ProductController) Create(ctx *gin.Context) {
 
 func (c ProductController) Edit(ctx *gin.Context) {
 	productUUID := ctx.Param("productUUID")
-	var updateProduct model.Products
-	if err := ctx.ShouldBindJSON(&updateProduct); err != nil {
+
+	productRequest := request.UpdateProductRequest{}
+	if err := ctx.ShouldBind(&productRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := c.productService.Update(productUUID, &updateProduct)
+	if err := c.Validate.Struct(productRequest); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	fileName := helper.RemoveExtension(productRequest.Image.Filename)
+	uploadResult, err := helper.UploadFile(productRequest.Image, fileName)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updateProduct := model.Products{
+		Name:      productRequest.Name,
+		Image_URL: uploadResult,
+	}
+	err = c.productService.Update(productUUID, updateProduct)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	webResponse := response.Response{
 		Code:    200,
 		Status:  true,
