@@ -72,7 +72,7 @@ func (c ProductController) Create(ctx *gin.Context) {
 }
 
 func (c ProductController) Edit(ctx *gin.Context) {
-	productUUID := ctx.Param("productUUID")
+	productUUID := ctx.Param("uuid")
 
 	productRequest := request.UpdateProductRequest{}
 	if err := ctx.ShouldBind(&productRequest); err != nil {
@@ -143,7 +143,7 @@ func (c ProductController) GetByAdminID(ctx *gin.Context) {
 }
 
 func (c ProductController) GetById(ctx *gin.Context) {
-	productUUID := ctx.Param("productUUID")
+	productUUID := ctx.Param("uuid")
 
 	productResponse := c.productService.GetById(productUUID)
 	webResponse := response.Response{
@@ -157,7 +157,7 @@ func (c ProductController) GetById(ctx *gin.Context) {
 }
 
 func (c ProductController) Delete(ctx *gin.Context) {
-	productUUID := ctx.Param("productUUID")
+	productUUID := ctx.Param("uuid")
 	c.productService.Delete(productUUID)
 	webResponse := response.Response{
 		Code:    200,

@@ -12,7 +12,7 @@ import (
 func ProductAuthorization() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		db := config.DBInit()
-		productUUID := ctx.Param("productUUID")
+		productUUID := ctx.Param("uuid")
 
 		adminData := ctx.MustGet("adminData").(jwt5.MapClaims)
 		adminID := uint(adminData["id"].(float64))

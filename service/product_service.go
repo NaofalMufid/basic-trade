@@ -71,6 +71,8 @@ func (p ProductServiceImpl) GetAll() []model.Products {
 			Name:      v.Name,
 			Image_URL: v.Image_URL,
 			Admin_ID:  v.Admin_ID,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt,
 		}
 		products = append(products, product)
 	}

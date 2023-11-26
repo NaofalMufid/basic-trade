@@ -84,16 +84,10 @@ func DeleteFile(publicID string) error {
 }
 
 func getPublicIDFromURL(imageURL string) (string, error) {
-	parts := strings.Split(imageURL, "/upload/")
-	if len(parts) != 2 {
-		return "", fmt.Errorf("invalid image url")
-	}
-
-	// Ambil bagian setelah "/upload/" sebagai Public ID
-	publicID := parts[1]
-
-	// Hapus ekstensi file jika ada (misalnya ".jpg")
+	parts := strings.Split(imageURL, "/")
+	publicID := parts[len(parts)-1]
 	publicID = strings.TrimSuffix(publicID, filepath.Ext(publicID))
+	publicID = config.EnvCloudUploadFolder() + "/" + publicID
 
 	return publicID, nil
 }

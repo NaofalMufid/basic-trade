@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(AdminController *controller.AdminController, ProductController *controller.ProductController) *gin.Engine {
+func NewRouter(AdminController *controller.AdminController, ProductController *controller.ProductController, VariantController *controller.VarianController) *gin.Engine {
 	service := gin.Default()
 
 	service.GET("", func(ctx *gin.Context) {
@@ -31,9 +31,19 @@ func NewRouter(AdminController *controller.AdminController, ProductController *c
 		productRouter.Use(middleware.Authentication())
 		productRouter.GET("/", ProductController.GetByAdminID)
 		productRouter.POST("/", ProductController.Create)
-		productRouter.GET("/:productUUID", middleware.ProductAuthorization(), ProductController.GetById)
-		productRouter.PUT("/:productUUID", middleware.ProductAuthorization(), ProductController.Edit)
-		productRouter.DELETE("/:productUUID", middleware.ProductAuthorization(), ProductController.Delete)
+		productRouter.GET("/:uuid", middleware.ProductAuthorization(), ProductController.GetById)
+		productRouter.PUT("/:uuid", middleware.ProductAuthorization(), ProductController.Edit)
+		productRouter.DELETE("/:uuid", middleware.ProductAuthorization(), ProductController.Delete)
+	}
+
+	variantRouter := router.Group("/variants")
+	{
+		variantRouter.Use(middleware.Authentication())
+		variantRouter.GET("/", VariantController.GetAll)
+		variantRouter.POST("/", VariantController.Create)
+		variantRouter.GET("/:uuid", VariantController.GetById)
+		variantRouter.PUT("/:uuid", VariantController.Edit)
+		variantRouter.DELETE("/:uuid", VariantController.Delete)
 	}
 
 	return service

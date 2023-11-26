@@ -7,7 +7,7 @@ import (
 )
 
 type AdminRepository interface {
-	Register(admin model.Admins)
+	Register(admin model.Admins) error
 	FindByEmail(email string) (*model.Admins, error)
 }
 
@@ -19,11 +19,12 @@ func NewAdminRepository(Db *gorm.DB) AdminRepository {
 	return &AdminRepositoryImpl{Db: Db}
 }
 
-func (a AdminRepositoryImpl) Register(admin model.Admins) {
+func (a AdminRepositoryImpl) Register(admin model.Admins) error {
 	result := a.Db.Create(&admin)
 	if result.Error != nil {
-		panic(result.Error)
+		return result.Error
 	}
+	return nil
 }
 
 func (a AdminRepositoryImpl) FindByEmail(email string) (*model.Admins, error) {
