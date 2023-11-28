@@ -39,7 +39,7 @@ func main() {
 	// Router
 	routes := router.NewRouter(adminController, productController, variantController)
 
-	port := os.Getenv("API_PORT")
+	port := os.Getenv("PORT")
 	server := &http.Server{
 		Addr:    port,
 		Handler: routes,
