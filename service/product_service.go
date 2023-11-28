@@ -1,6 +1,7 @@
 package service
 
 import (
+	"basic-trade/data/response"
 	"basic-trade/helper"
 	"basic-trade/model"
 	"basic-trade/repository"
@@ -10,8 +11,7 @@ import (
 )
 
 type ProductService interface {
-	GetAll() []model.Products
-	GetByAdminID(adminID int) ([]model.Products, error)
+	GetAll(page, size int, search string) (response.PaginatedProductResponse, error)
 	GetById(uuid string) model.Products
 	Create(product model.Products) error
 	Update(uuid string, product model.Products) error
@@ -61,12 +61,17 @@ func (p ProductServiceImpl) Update(uuid string, product model.Products) error {
 	return nil
 }
 
-func (p ProductServiceImpl) GetAll() []model.Products {
-	result := p.ProductRepository.FindAll()
-	var products []model.Products
+func (p ProductServiceImpl) GetAll(page, size int, search string) (response.PaginatedProductResponse, error) {
+	paginator := helper.NewPagination(page, size)
+
+	result, err := p.ProductRepository.FindAll(paginator.Page, paginator.PageSize, search)
+	if err != nil {
+		return response.PaginatedProductResponse{}, err
+	}
+
+	var products []response.ProductResponse
 	for _, v := range result {
-		product := model.Products{
-			ID:        v.ID,
+		product := response.ProductResponse{
 			UUID:      v.UUID,
 			Name:      v.Name,
 			Image_URL: v.Image_URL,
@@ -74,28 +79,35 @@ func (p ProductServiceImpl) GetAll() []model.Products {
 			CreatedAt: v.CreatedAt,
 			UpdatedAt: v.UpdatedAt,
 		}
-		products = append(products, product)
-	}
-	return products
-}
-
-func (p ProductServiceImpl) GetByAdminID(adminID int) ([]model.Products, error) {
-	result, err := p.ProductRepository.FindByAdminID(adminID)
-	if err != nil {
-		return nil, err
-	}
-	var products []model.Products
-	for _, v := range result {
-		product := model.Products{
-			ID:        v.ID,
-			UUID:      v.UUID,
-			Name:      v.Name,
-			Image_URL: v.Image_URL,
-			Admin_ID:  v.Admin_ID,
+		for _, variant := range v.Variants {
+			variantData := response.VariantResponse{
+				UUID:         variant.UUID,
+				Variant_Name: variant.Variant_Name,
+				Quantity:     variant.Quantity,
+				CreatedAt:    variant.CreatedAt,
+				UpdatedAt:    variant.UpdatedAt,
+			}
+			product.Variants = append(product.Variants, variantData)
 		}
 		products = append(products, product)
 	}
-	return products, nil
+
+	totalProduct, err := p.ProductRepository.CountProduct(search)
+	if err != nil {
+		return response.PaginatedProductResponse{}, err
+	}
+
+	totalPage := paginator.TotalPage(totalProduct)
+
+	productResponse := response.PaginatedProductResponse{
+		Page:      paginator.Page,
+		PageSize:  paginator.PageSize,
+		TotalPage: totalPage,
+		TotalData: totalProduct,
+		Data:      products,
+	}
+
+	return productResponse, nil
 }
 
 func (p ProductServiceImpl) GetById(uuid string) model.Products {

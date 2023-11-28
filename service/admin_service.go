@@ -51,7 +51,7 @@ func (a AdminServiceImpl) Login(email, password string) (string, error) {
 	}
 
 	if !helper.ComparePassword([]byte(admin.Password), []byte(password)) {
-		return "", errors.New("Invalid Password")
+		return "", errors.New("invalid password")
 	}
 
 	token := helper.GenerateToken(admin.ID, admin.Email)

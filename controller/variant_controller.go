@@ -6,6 +6,7 @@ import (
 	"basic-trade/model"
 	"basic-trade/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -25,7 +26,14 @@ func NewVariantController(service service.VariantService, validate *validator.Va
 }
 
 func (c VarianController) GetAll(ctx *gin.Context) {
-	variantResponse := c.variantService.GetAll()
+	page, _ := strconv.Atoi(ctx.Query("page"))
+	size, _ := strconv.Atoi(ctx.Query("size"))
+	search := ctx.Query("search")
+	variantResponse, err := c.variantService.GetAll(page, size, search)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	webResponse := response.Response{
 		Code:    200,
 		Status:  true,

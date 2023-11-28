@@ -7,6 +7,7 @@ import (
 	"basic-trade/model"
 	"basic-trade/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -112,22 +113,11 @@ func (c ProductController) Edit(ctx *gin.Context) {
 }
 
 func (c ProductController) GetAll(ctx *gin.Context) {
-	productResponse := c.productService.GetAll()
-	webResponse := response.Response{
-		Code:    200,
-		Status:  true,
-		Message: "successfully get all product",
-		Data:    productResponse,
-	}
-	ctx.Header("Content-Type", "application/json")
-	ctx.JSON(http.StatusOK, webResponse)
-}
+	page, _ := strconv.Atoi(ctx.Query("page"))
+	size, _ := strconv.Atoi(ctx.Query("size"))
+	search := ctx.Query("search")
 
-func (c ProductController) GetByAdminID(ctx *gin.Context) {
-	adminData := ctx.MustGet("adminData").(jwt5.MapClaims)
-	adminID := uint(adminData["id"].(float64))
-
-	productResponse, err := c.productService.GetByAdminID(int(adminID))
+	productResponse, err := c.productService.GetAll(page, size, search)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
