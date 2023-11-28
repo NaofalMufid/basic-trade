@@ -4,6 +4,7 @@ import (
 	"basic-trade/config"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -17,6 +18,17 @@ import (
 )
 
 func UploadFile(fileHeader *multipart.FileHeader, fileName string) (string, error) {
+	maxSize := int64(3 << 20)
+	if fileHeader.Size > maxSize {
+		return "", errors.New("file size exceeds the maximum allowed size 3 mb")
+	}
+
+	allowedExtensions := map[string]bool{"jpg": true, "jpeg": true, "png": true}
+	fileExt := strings.ToLower(filepath.Ext(fileHeader.Filename)[1:])
+	if !allowedExtensions[fileExt] {
+		return "", errors.New("invalid file extension, allowed extensions are jpg, jpeg, png")
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

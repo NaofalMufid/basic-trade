@@ -7,10 +7,11 @@ import (
 )
 
 type ProductResponse struct {
+	ID        int               `json:"id"`
 	UUID      uuid.UUID         `json:"uuid"`
 	Name      string            `json:"name"`
 	Image_URL string            `json:"image_url"`
-	Admin_ID  uint              `json:"admin_id"`
+	AdminID   uint              `json:"admin_id"`
 	CreatedAt *time.Time        `json:"created_at"`
 	UpdatedAt *time.Time        `json:"updated_at"`
 	Variants  []VariantResponse `json:"variants"`

@@ -14,12 +14,16 @@ import (
 )
 
 func main() {
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	panic(err)
+	// }
 	db := config.DBInit()
 	validate := validator.New()
 
-	db.Table("admins").AutoMigrate(&model.Admins{})
-	db.Table("products").AutoMigrate(&model.Products{})
-	db.Table("variants").AutoMigrate(&model.Variants{})
+	db.Table("admins").Debug().AutoMigrate(&model.Admins{})
+	db.Table("products").Debug().AutoMigrate(&model.Products{})
+	db.Table("variants").Debug().AutoMigrate(&model.Variants{})
 
 	// Init Repository
 	adminRepository := repository.NewAdminRepository(db)

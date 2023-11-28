@@ -11,7 +11,7 @@ type Variants struct {
 	UUID         uuid.UUID  `gorm:"type:varchar(100);uniqueIndex" json:"uuid"`
 	Variant_Name string     `gorm:"type:varchar(150)"`
 	Quantity     int        `gorm:"type:int"`
-	Product_ID   uint       `gorm:"type:int;ForeignKey:Product_ID"`
+	ProductID    uint       `gorm:"type:int;foreignKey:ProductID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	CreatedAt    *time.Time `gorm:"type:timestamp"`
 	UpdatedAt    *time.Time `gorm:"type:timestamp"`
 }

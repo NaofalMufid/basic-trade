@@ -16,7 +16,7 @@ type Admins struct {
 	Password  string     `gorm:"type:varchar(255)" json:"password"`
 	CreatedAt *time.Time `gorm:"type:timestamp" json:"created_at,omitempty"`
 	UpdatedAt *time.Time `gorm:"type:timestamp" json:"updated_at,omitempty"`
-	Products  []Products `gorm:"ForeignKey:Admin_ID;AssociationForeignKey:UUID" json:"products"`
+	Products  []Products `gorm:"ForeignKey:AdminID;AssociationForeignKey:UUID" json:"products"`
 }
 
 func (a *Admins) BeforeCreate(tx *gorm.DB) (err error) {

@@ -41,10 +41,11 @@ func (v VariantServiceImpl) GetAll(page, size int, search string) (response.Pagi
 	var variants []response.VariantResponse
 	for _, v := range result {
 		variant := response.VariantResponse{
+			ID:           v.ID,
 			UUID:         v.UUID,
 			Variant_Name: v.Variant_Name,
 			Quantity:     v.Quantity,
-			Product_ID:   v.Product_ID,
+			ProductID:    v.ProductID,
 			CreatedAt:    v.CreatedAt,
 			UpdatedAt:    v.UpdatedAt,
 		}
@@ -83,7 +84,7 @@ func (v VariantServiceImpl) Create(variant model.Variants) error {
 		UUID:         newUUID,
 		Variant_Name: variant.Variant_Name,
 		Quantity:     variant.Quantity,
-		Product_ID:   variant.Product_ID,
+		ProductID:    variant.ProductID,
 	}
 	v.VariantRepository.Save(variantModel)
 	return nil

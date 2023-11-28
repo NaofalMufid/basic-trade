@@ -7,10 +7,11 @@ import (
 )
 
 type VariantResponse struct {
+	ID           int        `json:"id"`
 	UUID         uuid.UUID  `json:"uuid"`
 	Variant_Name string     `json:"variant_name"`
 	Quantity     int        `json:"quantity"`
-	Product_ID   uint       `json:"product_id"`
+	ProductID    uint       `json:"product_id"`
 	CreatedAt    *time.Time `json:"created_at"`
 	UpdatedAt    *time.Time `json:"updated_at"`
 }

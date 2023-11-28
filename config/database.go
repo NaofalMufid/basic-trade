@@ -9,11 +9,6 @@ import (
 )
 
 func DBInit() *gorm.DB {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")
