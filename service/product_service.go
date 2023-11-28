@@ -36,7 +36,7 @@ func (p ProductServiceImpl) Create(product model.Products) error {
 		UUID:      newUUID,
 		Name:      product.Name,
 		Image_URL: product.Image_URL,
-		Admin_ID:  product.Admin_ID,
+		AdminID:   product.AdminID,
 	}
 	p.ProductRepository.Save(productModel)
 	return nil
@@ -72,15 +72,17 @@ func (p ProductServiceImpl) GetAll(page, size int, search string) (response.Pagi
 	var products []response.ProductResponse
 	for _, v := range result {
 		product := response.ProductResponse{
+			ID:        v.ID,
 			UUID:      v.UUID,
 			Name:      v.Name,
 			Image_URL: v.Image_URL,
-			Admin_ID:  v.Admin_ID,
+			AdminID:   v.AdminID,
 			CreatedAt: v.CreatedAt,
 			UpdatedAt: v.UpdatedAt,
 		}
 		for _, variant := range v.Variants {
 			variantData := response.VariantResponse{
+				ID:           variant.ID,
 				UUID:         variant.UUID,
 				Variant_Name: variant.Variant_Name,
 				Quantity:     variant.Quantity,

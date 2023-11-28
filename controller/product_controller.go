@@ -55,7 +55,7 @@ func (c ProductController) Create(ctx *gin.Context) {
 		UUID:      newUUID,
 		Name:      productRequest.Name,
 		Image_URL: uploadResult,
-		Admin_ID:  adminID,
+		AdminID:   adminID,
 	}
 	if err := c.productService.Create(product); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

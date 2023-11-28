@@ -80,7 +80,7 @@ func (c VarianController) Create(ctx *gin.Context) {
 		UUID:         newUUID,
 		Variant_Name: variantRequest.Variant_Name,
 		Quantity:     variantRequest.Quantity,
-		Product_ID:   variantRequest.Product_ID,
+		ProductID:    variantRequest.ProductID,
 	}
 	if err := c.variantService.Create(variant); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
