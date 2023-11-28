@@ -22,7 +22,7 @@ func NewAdminController(service service.AdminService) *AdminController {
 func (controller AdminController) Register(ctx *gin.Context) {
 	createAdminRequest := request.CreateAdminRequest{}
 
-	err := ctx.ShouldBindJSON(&createAdminRequest)
+	err := ctx.ShouldBind(&createAdminRequest)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -46,7 +46,7 @@ func (controller AdminController) Register(ctx *gin.Context) {
 func (controller AdminController) Login(ctx *gin.Context) {
 	loginRequest := request.LoginAdminRequest{}
 
-	err := ctx.ShouldBindJSON(&loginRequest)
+	err := ctx.ShouldBind(&loginRequest)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

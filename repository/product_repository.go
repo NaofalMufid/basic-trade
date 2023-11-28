@@ -7,9 +7,9 @@ import (
 )
 
 type ProductRepository interface {
-	FindAll() []model.Products
-	FindByAdminID(adminID int) ([]model.Products, error)
+	FindAll(page, size int, search string) ([]model.Products, error)
 	FindById(uuid string) (product model.Products, err error)
+	CountProduct(search string) (int64, error)
 	Save(product model.Products) error
 	Update(product model.Products) error
 	Delete(uuid string) error
@@ -38,21 +38,37 @@ func (p ProductRepositoryImpl) Update(product model.Products) error {
 	return nil
 }
 
-func (p ProductRepositoryImpl) FindAll() []model.Products {
+func (p ProductRepositoryImpl) FindAll(page, size int, search string) ([]model.Products, error) {
 	var products []model.Products
-	result := p.Db.Find(&products)
-	if result.Error != nil {
-		panic(result.Error)
-	}
-	return products
-}
+	query := p.Db.Model(&model.Products{}).Preload("Variants")
 
-func (p ProductRepositoryImpl) FindByAdminID(adminID int) ([]model.Products, error) {
-	var products []model.Products
-	if err := p.Db.Where("admin_id", adminID).Find(&products).Error; err != nil {
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
+	}
+
+	if size > 0 {
+		offset := (page - 1) * size
+		query = query.Offset(offset).Limit(size)
+	}
+
+	if err := query.Find(&products).Error; err != nil {
 		return nil, err
 	}
 	return products, nil
+}
+
+func (p ProductRepositoryImpl) CountProduct(search string) (int64, error) {
+	var count int64
+	query := p.Db.Model(&model.Products{})
+
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func (p ProductRepositoryImpl) FindById(uuid string) (model.Products, error) {

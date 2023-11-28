@@ -6,6 +6,7 @@ import (
 	"basic-trade/model"
 	"basic-trade/repository"
 	"errors"
+	"fmt"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -30,7 +31,7 @@ func NewAdminServiceImpl(adminRepository repository.AdminRepository, validate *v
 
 func (a AdminServiceImpl) Register(admin request.CreateAdminRequest) error {
 	if err := a.Validate.Struct(admin); err != nil {
-		return err
+		return fmt.Errorf("validation error: %v", err)
 	}
 	newUUID := uuid.New()
 	adminModel := model.Admins{
@@ -50,7 +51,7 @@ func (a AdminServiceImpl) Login(email, password string) (string, error) {
 	}
 
 	if !helper.ComparePassword([]byte(admin.Password), []byte(password)) {
-		return "", errors.New("Invalid Password")
+		return "", errors.New("invalid password")
 	}
 
 	token := helper.GenerateToken(admin.ID, admin.Email)

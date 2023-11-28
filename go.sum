@@ -8,6 +8,8 @@ github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d h1:77cEq6EriyTZ
 github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d/go.mod h1:8EPpVsBuRksnlj1mLy4AWzRNQYxauNi62uWcE3to6eA=
 github.com/chenzhuoyu/iasm v0.9.0 h1:9fhXjVzq5hUy2gkhhgHl95zG2cEAhw9OSGs8toWWAwo=
 github.com/chenzhuoyu/iasm v0.9.0/go.mod h1:Xjy2NpN3h7aUqeqM+woSuuvxmIe6+DDsiNLIrkAmYog=
+github.com/cloudinary/cloudinary-go v1.7.0 h1:KI+1C5JM1TsWi3NNSVitshnQEc5n27firfWIEPDsoWQ=
+github.com/cloudinary/cloudinary-go v1.7.0/go.mod h1:V1AhCEPFlSN2FN3OosHgu4iX1SkusvDCgfSE7eU79Vo=
 github.com/cloudinary/cloudinary-go/v2 v2.5.1 h1:RZKSfrmYHwXVTKAnjr2dibzpu7ox2QLtoSF/xVznLvM=
 github.com/cloudinary/cloudinary-go/v2 v2.5.1/go.mod h1:jtSxa6xbzvu4IwChRJVDcXwVXrTRczhbvq3Z1VSoFdk=
 github.com/creasty/defaults v1.5.1 h1:j8WexcS3d/t4ZmllX4GEkl4wIB/trOr035ajcLHCISM=
