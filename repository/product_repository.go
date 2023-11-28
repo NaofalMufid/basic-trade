@@ -73,7 +73,7 @@ func (p ProductRepositoryImpl) CountProduct(search string) (int64, error) {
 
 func (p ProductRepositoryImpl) FindById(uuid string) (model.Products, error) {
 	var product model.Products
-	if err := p.Db.Where("uuid", uuid).First(&product).Error; err != nil {
+	if err := p.Db.Where("uuid", uuid).Preload("Variants").First(&product).Error; err != nil {
 		return product, err
 	}
 	return product, nil

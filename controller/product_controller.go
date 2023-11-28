@@ -135,7 +135,11 @@ func (c ProductController) GetAll(ctx *gin.Context) {
 func (c ProductController) GetById(ctx *gin.Context) {
 	productUUID := ctx.Param("uuid")
 
-	productResponse := c.productService.GetById(productUUID)
+	productResponse, err := c.productService.GetById(productUUID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	webResponse := response.Response{
 		Code:    200,
 		Status:  true,

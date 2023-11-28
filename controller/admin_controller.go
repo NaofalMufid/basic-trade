@@ -28,7 +28,8 @@ func (controller AdminController) Register(ctx *gin.Context) {
 		return
 	}
 
-	if err := controller.adminService.Register(createAdminRequest); err != nil {
+	newAdmin, err := controller.adminService.Register(createAdminRequest)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -37,7 +38,7 @@ func (controller AdminController) Register(ctx *gin.Context) {
 		Code:    201,
 		Status:  true,
 		Message: "successfully register admin",
-		Data:    nil,
+		Data:    newAdmin,
 	}
 
 	ctx.JSON(http.StatusCreated, webResponse)
@@ -52,7 +53,7 @@ func (controller AdminController) Login(ctx *gin.Context) {
 		return
 	}
 
-	token, err := controller.adminService.Login(loginRequest.Email, loginRequest.Password)
+	data, err := controller.adminService.Login(loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		ctx.JSON(401, gin.H{"error": "Invalid credentials"})
 		return
@@ -62,7 +63,7 @@ func (controller AdminController) Login(ctx *gin.Context) {
 		Code:    200,
 		Status:  true,
 		Message: "success login admin",
-		Data:    token,
+		Data:    data,
 	}
 
 	ctx.JSON(200, webResponse)

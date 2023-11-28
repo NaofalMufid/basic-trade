@@ -1,13 +1,14 @@
 package repository
 
 import (
+	"basic-trade/data/response"
 	"basic-trade/model"
 
 	"gorm.io/gorm"
 )
 
 type AdminRepository interface {
-	Register(admin model.Admins) error
+	Register(admin model.Admins) (response.AdminResponse, error)
 	FindByEmail(email string) (*model.Admins, error)
 }
 
@@ -19,12 +20,17 @@ func NewAdminRepository(Db *gorm.DB) AdminRepository {
 	return &AdminRepositoryImpl{Db: Db}
 }
 
-func (a AdminRepositoryImpl) Register(admin model.Admins) error {
+func (a AdminRepositoryImpl) Register(admin model.Admins) (response.AdminResponse, error) {
 	result := a.Db.Create(&admin)
 	if result.Error != nil {
-		return result.Error
+		return response.AdminResponse{}, result.Error
 	}
-	return nil
+	data := response.AdminResponse{
+		UUID:  admin.UUID,
+		Name:  admin.Name,
+		Email: admin.Email,
+	}
+	return data, nil
 }
 
 func (a AdminRepositoryImpl) FindByEmail(email string) (*model.Admins, error) {
