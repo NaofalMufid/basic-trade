@@ -11,13 +11,14 @@ import (
 	"os"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
 	db := config.DBInit()
 	validate := validator.New()
 
@@ -44,7 +45,7 @@ func main() {
 	routes := router.NewRouter(adminController, productController, variantController)
 	port := os.Getenv("PORT")
 	address := fmt.Sprintf(":%s", port)
-	err := routes.Run(address)
+	err = routes.Run(address)
 	if err != nil {
 		panic(err)
 	}

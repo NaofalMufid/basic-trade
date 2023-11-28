@@ -2,6 +2,7 @@ package service
 
 import (
 	"basic-trade/data/request"
+	"basic-trade/data/response"
 	"basic-trade/helper"
 	"basic-trade/model"
 	"basic-trade/repository"
@@ -13,8 +14,8 @@ import (
 )
 
 type AdminService interface {
-	Register(admin request.CreateAdminRequest) error
-	Login(email, password string) (string, error)
+	Register(admin request.CreateAdminRequest) (response.AdminResponse, error)
+	Login(email, password string) (response.LoginResponse, error)
 }
 
 type AdminServiceImpl struct {
@@ -29,9 +30,9 @@ func NewAdminServiceImpl(adminRepository repository.AdminRepository, validate *v
 	}
 }
 
-func (a AdminServiceImpl) Register(admin request.CreateAdminRequest) error {
+func (a AdminServiceImpl) Register(admin request.CreateAdminRequest) (response.AdminResponse, error) {
 	if err := a.Validate.Struct(admin); err != nil {
-		return fmt.Errorf("validation error: %v", err)
+		return response.AdminResponse{}, fmt.Errorf("validation error: %v", err)
 	}
 	newUUID := uuid.New()
 	adminModel := model.Admins{
@@ -40,20 +41,28 @@ func (a AdminServiceImpl) Register(admin request.CreateAdminRequest) error {
 		Email:    admin.Email,
 		Password: admin.Password,
 	}
-	a.AdminRepository.Register(adminModel)
-	return nil
+	newAdmin, err := a.AdminRepository.Register(adminModel)
+	if err != nil {
+		return response.AdminResponse{}, err
+	}
+	return newAdmin, nil
 }
 
-func (a AdminServiceImpl) Login(email, password string) (string, error) {
+func (a AdminServiceImpl) Login(email, password string) (response.LoginResponse, error) {
 	admin, err := a.AdminRepository.FindByEmail(email)
 	if err != nil {
-		return "", err
+		return response.LoginResponse{}, err
 	}
 
 	if !helper.ComparePassword([]byte(admin.Password), []byte(password)) {
-		return "", errors.New("invalid password")
+		return response.LoginResponse{}, errors.New("invalid password")
 	}
-
 	token := helper.GenerateToken(admin.ID, admin.Email)
-	return token, nil
+	data := response.LoginResponse{
+		UUID:  admin.UUID,
+		Name:  admin.Name,
+		Email: admin.Email,
+		Token: token,
+	}
+	return data, nil
 }

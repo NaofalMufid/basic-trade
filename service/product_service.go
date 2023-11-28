@@ -12,7 +12,7 @@ import (
 
 type ProductService interface {
 	GetAll(page, size int, search string) (response.PaginatedProductResponse, error)
-	GetById(uuid string) model.Products
+	GetById(uuid string) (response.ProductResponse, error)
 	Create(product model.Products) error
 	Update(uuid string, product model.Products) error
 	Delete(uuid string) error
@@ -85,6 +85,7 @@ func (p ProductServiceImpl) GetAll(page, size int, search string) (response.Pagi
 				ID:           variant.ID,
 				UUID:         variant.UUID,
 				Variant_Name: variant.Variant_Name,
+				ProductID:    variant.ProductID,
 				Quantity:     variant.Quantity,
 				CreatedAt:    variant.CreatedAt,
 				UpdatedAt:    variant.UpdatedAt,
@@ -112,12 +113,32 @@ func (p ProductServiceImpl) GetAll(page, size int, search string) (response.Pagi
 	return productResponse, nil
 }
 
-func (p ProductServiceImpl) GetById(uuid string) model.Products {
+func (p ProductServiceImpl) GetById(uuid string) (response.ProductResponse, error) {
 	product, err := p.ProductRepository.FindById(uuid)
 	if err != nil {
 		panic(err)
 	}
-	return product
+	data := response.ProductResponse{
+		ID:        product.ID,
+		Name:      product.Name,
+		Image_URL: product.Image_URL,
+		AdminID:   product.AdminID,
+		CreatedAt: product.CreatedAt,
+		UpdatedAt: product.UpdatedAt,
+	}
+	for _, v := range product.Variants {
+		variant := response.VariantResponse{
+			ID:           v.ID,
+			UUID:         v.UUID,
+			Variant_Name: v.Variant_Name,
+			ProductID:    v.ProductID,
+			Quantity:     v.Quantity,
+			CreatedAt:    v.CreatedAt,
+			UpdatedAt:    v.UpdatedAt,
+		}
+		data.Variants = append(data.Variants, variant)
+	}
+	return data, nil
 }
 
 func (p ProductServiceImpl) Delete(uuid string) error {
