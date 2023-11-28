@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func DBInit() *gorm.DB {
-	err := godotenv.Load()
-	if err != nil {
-		panic(err)
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
