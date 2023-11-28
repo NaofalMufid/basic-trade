@@ -7,7 +7,7 @@ import (
 	"basic-trade/repository"
 	"basic-trade/router"
 	"basic-trade/service"
-	"net/http"
+	"fmt"
 	"os"
 
 	"github.com/go-playground/validator/v10"
@@ -38,14 +38,9 @@ func main() {
 
 	// Router
 	routes := router.NewRouter(adminController, productController, variantController)
-
 	port := os.Getenv("PORT")
-	server := &http.Server{
-		Addr:    port,
-		Handler: routes,
-	}
-
-	err := server.ListenAndServe()
+	address := fmt.Sprintf(":%s", port)
+	err := routes.Run(address)
 	if err != nil {
 		panic(err)
 	}
