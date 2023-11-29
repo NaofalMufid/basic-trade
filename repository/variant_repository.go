@@ -13,6 +13,7 @@ type VariantRepository interface {
 	Save(variant model.Variants) error
 	Update(variant model.Variants) error
 	Delete(uuid string) error
+	DeleteByProductID(productID uint) error
 }
 
 type VariantRepositoryImpl struct {
@@ -79,6 +80,13 @@ func (v VariantRepositoryImpl) Update(variant model.Variants) error {
 func (v VariantRepositoryImpl) Delete(uuid string) error {
 	var variant model.Variants
 	if err := v.Db.Where("uuid", uuid).Delete(&variant).Error; err != nil {
+		return err
+	}
+	return nil
+}
+func (v VariantRepositoryImpl) DeleteByProductID(productID uint) error {
+	var variant model.Variants
+	if err := v.Db.Where("product_id", productID).Delete(&variant).Error; err != nil {
 		return err
 	}
 	return nil
