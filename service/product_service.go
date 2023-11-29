@@ -20,12 +20,14 @@ type ProductService interface {
 
 type ProductServiceImpl struct {
 	ProductRepository repository.ProductRepository
+	VariantRepository repository.VariantRepository
 	Validate          *validator.Validate
 }
 
-func NewProductService(productRepository repository.ProductRepository, validate *validator.Validate) ProductService {
+func NewProductService(productRepository repository.ProductRepository, variantRepository repository.VariantRepository, validate *validator.Validate) ProductService {
 	return &ProductServiceImpl{
 		ProductRepository: productRepository,
+		VariantRepository: variantRepository,
 		Validate:          validate,
 	}
 }
@@ -144,6 +146,10 @@ func (p ProductServiceImpl) GetById(uuid string) (response.ProductResponse, erro
 func (p ProductServiceImpl) Delete(uuid string) error {
 	productData, err := p.ProductRepository.FindById(uuid)
 	if err != nil {
+		return err
+	}
+
+	if err := p.VariantRepository.DeleteByProductID(uint(productData.ID)); err != nil {
 		return err
 	}
 

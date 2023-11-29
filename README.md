@@ -19,7 +19,7 @@ This project is the result of the final project for the Golang class. A simple A
    ``````
 
 3. Available Endpoints
-
+   Railway url : https://fp-basic-trade.up.railway.app/
     | Method | Endpoint                    | Description                   |
     | ------ | --------------------------- | ----------------------------- |
     | POST   | /api/auth/register          | Register a new user           |

@@ -32,7 +32,7 @@ func main() {
 
 	// Init Service
 	adminService := service.NewAdminServiceImpl(adminRepository, validate)
-	productService := service.NewProductService(productRepository, validate)
+	productService := service.NewProductService(productRepository, variantRepository, validate)
 	variantService := service.NewVariantService(variantRepository, validate)
 
 	// Init Controller
