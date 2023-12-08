@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"basic-trade/data/response"
 	"basic-trade/model"
 
 	"gorm.io/gorm"
@@ -10,10 +11,10 @@ type VariantRepository interface {
 	FindAll(page, size int, search string) ([]model.Variants, error)
 	FindByID(uuid string) (model.Variants, error)
 	CountVariant(search string) (int64, error)
-	Save(variant model.Variants) error
-	Update(variant model.Variants) error
+	Save(variant model.Variants) (response.VariantResponse, error)
+	Update(variant model.Variants) (response.VariantResponse, error)
 	Delete(uuid string) error
-	DeleteByProductID(productID uint) error
+	DeleteByProductID(productID string) error
 }
 
 type VariantRepositoryImpl struct {
@@ -62,19 +63,37 @@ func (v VariantRepositoryImpl) FindByID(uuid string) (model.Variants, error) {
 	return variant, nil
 }
 
-func (v VariantRepositoryImpl) Save(variant model.Variants) error {
+func (v VariantRepositoryImpl) Save(variant model.Variants) (response.VariantResponse, error) {
 	result := v.Db.Create(&variant)
 	if result.Error != nil {
-		return result.Error
+		return response.VariantResponse{}, result.Error
 	}
-	return nil
+	new_variant := response.VariantResponse{
+		ID:           variant.ID,
+		UUID:         variant.UUID,
+		Variant_Name: variant.Variant_Name,
+		Quantity:     variant.Quantity,
+		ProductID:    variant.ProductID,
+		CreatedAt:    variant.CreatedAt,
+		UpdatedAt:    variant.UpdatedAt,
+	}
+	return new_variant, nil
 }
 
-func (v VariantRepositoryImpl) Update(variant model.Variants) error {
+func (v VariantRepositoryImpl) Update(variant model.Variants) (response.VariantResponse, error) {
 	if err := v.Db.Save(&variant).Error; err != nil {
-		return err
+		return response.VariantResponse{}, err
 	}
-	return nil
+	update_variant := response.VariantResponse{
+		ID:           variant.ID,
+		UUID:         variant.UUID,
+		Variant_Name: variant.Variant_Name,
+		Quantity:     variant.Quantity,
+		ProductID:    variant.ProductID,
+		CreatedAt:    variant.CreatedAt,
+		UpdatedAt:    variant.UpdatedAt,
+	}
+	return update_variant, nil
 }
 
 func (v VariantRepositoryImpl) Delete(uuid string) error {
@@ -84,7 +103,7 @@ func (v VariantRepositoryImpl) Delete(uuid string) error {
 	}
 	return nil
 }
-func (v VariantRepositoryImpl) DeleteByProductID(productID uint) error {
+func (v VariantRepositoryImpl) DeleteByProductID(productID string) error {
 	var variant model.Variants
 	if err := v.Db.Where("product_id", productID).Delete(&variant).Error; err != nil {
 		return err

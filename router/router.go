@@ -28,22 +28,24 @@ func NewRouter(AdminController *controller.AdminController, ProductController *c
 
 	productRouter := router.Group("/products")
 	{
-		productRouter.Use(middleware.Authentication())
 		productRouter.GET("/", ProductController.GetAll)
+		productRouter.GET("/:uuid", ProductController.GetById)
+
+		productRouter.Use(middleware.Authentication())
 		productRouter.POST("/", ProductController.Create)
-		productRouter.GET("/:uuid", middleware.ProductAuthorization(), ProductController.GetById)
 		productRouter.PUT("/:uuid", middleware.ProductAuthorization(), ProductController.Edit)
 		productRouter.DELETE("/:uuid", middleware.ProductAuthorization(), ProductController.Delete)
 	}
 
 	variantRouter := router.Group("/variants")
 	{
-		variantRouter.Use(middleware.Authentication())
 		variantRouter.GET("/", VariantController.GetAll)
-		variantRouter.POST("/", VariantController.Create)
 		variantRouter.GET("/:uuid", VariantController.GetById)
-		variantRouter.PUT("/:uuid", VariantController.Edit)
-		variantRouter.DELETE("/:uuid", VariantController.Delete)
+
+		variantRouter.Use(middleware.Authentication())
+		variantRouter.POST("/", middleware.ProductAuthorization(), VariantController.Create)
+		variantRouter.PUT("/:uuid", middleware.VariantAuthorization(), VariantController.Edit)
+		variantRouter.DELETE("/:uuid", middleware.VariantAuthorization(), VariantController.Delete)
 	}
 
 	return service

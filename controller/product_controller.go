@@ -35,7 +35,6 @@ func (c ProductController) Create(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&productRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
 	}
 
 	if err := c.Validate.Struct(productRequest); err != nil {
@@ -50,14 +49,15 @@ func (c ProductController) Create(ctx *gin.Context) {
 		return
 	}
 
-	newUUID := uuid.New()
+	newUUID := uuid.NewString()
 	product := model.Products{
 		UUID:      newUUID,
 		Name:      productRequest.Name,
 		Image_URL: uploadResult,
 		AdminID:   adminID,
 	}
-	if err := c.productService.Create(product); err != nil {
+	new_product, err := c.productService.Create(product)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -66,7 +66,7 @@ func (c ProductController) Create(ctx *gin.Context) {
 		Code:    201,
 		Status:  true,
 		Message: "successfully create product",
-		Data:    nil,
+		Data:    new_product,
 	}
 
 	ctx.JSON(http.StatusCreated, webResponse)
@@ -96,7 +96,7 @@ func (c ProductController) Edit(ctx *gin.Context) {
 		Name:      productRequest.Name,
 		Image_URL: uploadResult,
 	}
-	err = c.productService.Update(productUUID, updateProduct)
+	productUpdate, err := c.productService.Update(productUUID, updateProduct)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -106,7 +106,7 @@ func (c ProductController) Edit(ctx *gin.Context) {
 		Code:    200,
 		Status:  true,
 		Message: "successfully update product",
-		Data:    nil,
+		Data:    productUpdate,
 	}
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(http.StatusOK, webResponse)

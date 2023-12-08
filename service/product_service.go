@@ -13,8 +13,8 @@ import (
 type ProductService interface {
 	GetAll(page, size int, search string) (response.PaginatedProductResponse, error)
 	GetById(uuid string) (response.ProductResponse, error)
-	Create(product model.Products) error
-	Update(uuid string, product model.Products) error
+	Create(product model.Products) (response.ProductResponse, error)
+	Update(uuid string, product model.Products) (response.ProductResponse, error)
 	Delete(uuid string) error
 }
 
@@ -32,35 +32,38 @@ func NewProductService(productRepository repository.ProductRepository, variantRe
 	}
 }
 
-func (p ProductServiceImpl) Create(product model.Products) error {
-	newUUID := uuid.New()
+func (p ProductServiceImpl) Create(product model.Products) (response.ProductResponse, error) {
+	newUUID := uuid.NewString()
 	productModel := model.Products{
 		UUID:      newUUID,
 		Name:      product.Name,
 		Image_URL: product.Image_URL,
 		AdminID:   product.AdminID,
 	}
-	p.ProductRepository.Save(productModel)
-	return nil
+	new_product, err := p.ProductRepository.Save(productModel)
+	if err != nil {
+		return response.ProductResponse{}, err
+	}
+	return new_product, nil
 }
 
-func (p ProductServiceImpl) Update(uuid string, product model.Products) error {
+func (p ProductServiceImpl) Update(uuid string, product model.Products) (response.ProductResponse, error) {
 	productData, err := p.ProductRepository.FindById(uuid)
 	if err != nil {
-		return err
+		return response.ProductResponse{}, err
 	}
 
 	if err := helper.DeleteFile(productData.Image_URL); err != nil {
-		return err
+		return response.ProductResponse{}, err
 	}
 
 	productData.Name = product.Name
 	productData.Image_URL = product.Image_URL
-	err = p.ProductRepository.Update(productData)
+	productUpdate, err := p.ProductRepository.Update(productData)
 	if err != nil {
-		return err
+		return response.ProductResponse{}, err
 	}
-	return nil
+	return productUpdate, nil
 }
 
 func (p ProductServiceImpl) GetAll(page, size int, search string) (response.PaginatedProductResponse, error) {
@@ -149,7 +152,7 @@ func (p ProductServiceImpl) Delete(uuid string) error {
 		return err
 	}
 
-	if err := p.VariantRepository.DeleteByProductID(uint(productData.ID)); err != nil {
+	if err := p.VariantRepository.DeleteByProductID(productData.UUID); err != nil {
 		return err
 	}
 

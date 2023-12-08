@@ -2,13 +2,11 @@ package response
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type ProductResponse struct {
 	ID        int               `json:"id"`
-	UUID      uuid.UUID         `json:"uuid"`
+	UUID      string            `json:"uuid"`
 	Name      string            `json:"name"`
 	Image_URL string            `json:"image_url"`
 	AdminID   uint              `json:"admin_id"`
