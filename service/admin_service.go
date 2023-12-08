@@ -59,6 +59,7 @@ func (a AdminServiceImpl) Login(email, password string) (response.LoginResponse,
 	}
 	token := helper.GenerateToken(admin.ID, admin.Email)
 	data := response.LoginResponse{
+		ID:    int(admin.ID),
 		UUID:  admin.UUID,
 		Name:  admin.Name,
 		Email: admin.Email,

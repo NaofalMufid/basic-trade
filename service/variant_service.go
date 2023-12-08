@@ -13,8 +13,8 @@ import (
 type VariantService interface {
 	GetAll(page, size int, search string) (response.PaginatedVariantResponse, error)
 	GetById(uuid string) (model.Variants, error)
-	Create(variant model.Variants) error
-	Update(uuid string, variant model.Variants) error
+	Create(variant model.Variants) (response.VariantResponse, error)
+	Update(uuid string, variant model.Variants) (response.VariantResponse, error)
 	Delete(uuid string) error
 }
 
@@ -78,31 +78,34 @@ func (v VariantServiceImpl) GetById(uuid string) (model.Variants, error) {
 	return variant, nil
 }
 
-func (v VariantServiceImpl) Create(variant model.Variants) error {
-	newUUID := uuid.New()
+func (v VariantServiceImpl) Create(variant model.Variants) (response.VariantResponse, error) {
+	newUUID := uuid.NewString()
 	variantModel := model.Variants{
 		UUID:         newUUID,
 		Variant_Name: variant.Variant_Name,
 		Quantity:     variant.Quantity,
 		ProductID:    variant.ProductID,
 	}
-	v.VariantRepository.Save(variantModel)
-	return nil
+	new_variant, err := v.VariantRepository.Save(variantModel)
+	if err != nil {
+		return response.VariantResponse{}, err
+	}
+	return new_variant, nil
 }
 
-func (v VariantServiceImpl) Update(uuid string, variant model.Variants) error {
+func (v VariantServiceImpl) Update(uuid string, variant model.Variants) (response.VariantResponse, error) {
 	variantData, err := v.VariantRepository.FindByID(uuid)
 	if err != nil {
-		return err
+		return response.VariantResponse{}, err
 	}
 
 	variantData.Variant_Name = variant.Variant_Name
 	variantData.Quantity = variant.Quantity
-	err = v.VariantRepository.Update(variantData)
+	variantUPdate, err := v.VariantRepository.Update(variantData)
 	if err != nil {
-		return err
+		return response.VariantResponse{}, err
 	}
-	return nil
+	return variantUPdate, nil
 }
 
 func (v VariantServiceImpl) Delete(uuid string) error {

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"basic-trade/data/response"
 	"basic-trade/model"
 
 	"gorm.io/gorm"
@@ -10,8 +11,8 @@ type ProductRepository interface {
 	FindAll(page, size int, search string) ([]model.Products, error)
 	FindById(uuid string) (product model.Products, err error)
 	CountProduct(search string) (int64, error)
-	Save(product model.Products) error
-	Update(product model.Products) error
+	Save(product model.Products) (response.ProductResponse, error)
+	Update(product model.Products) (response.ProductResponse, error)
 	Delete(uuid string) error
 }
 
@@ -23,19 +24,37 @@ func NewProductRepository(Db *gorm.DB) ProductRepository {
 	return &ProductRepositoryImpl{Db: Db}
 }
 
-func (p ProductRepositoryImpl) Save(product model.Products) error {
+func (p ProductRepositoryImpl) Save(product model.Products) (response.ProductResponse, error) {
 	result := p.Db.Create(&product)
 	if result.Error != nil {
-		return result.Error
+		return response.ProductResponse{}, result.Error
 	}
-	return nil
+	new_product := response.ProductResponse{
+		ID:        product.ID,
+		UUID:      product.UUID,
+		Name:      product.Name,
+		Image_URL: product.Image_URL,
+		AdminID:   product.AdminID,
+		CreatedAt: product.CreatedAt,
+		UpdatedAt: product.UpdatedAt,
+	}
+	return new_product, nil
 }
 
-func (p ProductRepositoryImpl) Update(product model.Products) error {
+func (p ProductRepositoryImpl) Update(product model.Products) (response.ProductResponse, error) {
 	if err := p.Db.Save(&product).Error; err != nil {
-		return err
+		return response.ProductResponse{}, err
 	}
-	return nil
+	update_product := response.ProductResponse{
+		ID:        product.ID,
+		UUID:      product.UUID,
+		Name:      product.Name,
+		Image_URL: product.Image_URL,
+		AdminID:   product.AdminID,
+		CreatedAt: product.CreatedAt,
+		UpdatedAt: product.UpdatedAt,
+	}
+	return update_product, nil
 }
 
 func (p ProductRepositoryImpl) FindAll(page, size int, search string) ([]model.Products, error) {

@@ -75,14 +75,15 @@ func (c VarianController) Create(ctx *gin.Context) {
 		return
 	}
 
-	newUUID := uuid.New()
+	newUUID := uuid.NewString()
 	variant := model.Variants{
 		UUID:         newUUID,
 		Variant_Name: variantRequest.Variant_Name,
 		Quantity:     variantRequest.Quantity,
 		ProductID:    variantRequest.ProductID,
 	}
-	if err := c.variantService.Create(variant); err != nil {
+	new_variant, err := c.variantService.Create(variant)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -91,7 +92,7 @@ func (c VarianController) Create(ctx *gin.Context) {
 		Code:    201,
 		Status:  true,
 		Message: "successfully create variant",
-		Data:    nil,
+		Data:    new_variant,
 	}
 
 	ctx.JSON(http.StatusCreated, webResponse)
@@ -115,7 +116,8 @@ func (c VarianController) Edit(ctx *gin.Context) {
 		Quantity:     variantRequest.Quantity,
 	}
 
-	if err := c.variantService.Update(variantID, updateVariant); err != nil {
+	variantUpdate, err := c.variantService.Update(variantID, updateVariant)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -124,7 +126,7 @@ func (c VarianController) Edit(ctx *gin.Context) {
 		Code:    200,
 		Status:  true,
 		Message: "successfully update variant",
-		Data:    nil,
+		Data:    variantUpdate,
 	}
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(http.StatusOK, webResponse)

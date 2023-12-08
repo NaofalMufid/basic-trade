@@ -21,11 +21,15 @@ func NewAdminRepository(Db *gorm.DB) AdminRepository {
 }
 
 func (a AdminRepositoryImpl) Register(admin model.Admins) (response.AdminResponse, error) {
+	if err := admin.Validate(); err != nil {
+		return response.AdminResponse{}, err
+	}
 	result := a.Db.Create(&admin)
 	if result.Error != nil {
 		return response.AdminResponse{}, result.Error
 	}
 	data := response.AdminResponse{
+		ID:    int(admin.ID),
 		UUID:  admin.UUID,
 		Name:  admin.Name,
 		Email: admin.Email,
